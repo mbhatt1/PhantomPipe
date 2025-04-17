@@ -52,39 +52,41 @@ All communication goes over the public SSE endpoint provided by ngrok.
 flowchart TD
   subgraph Local_Server["Local Server"]
     direction TB
-    Srv["server.py<br/>FastMCP @ port 8000"]
-    Stores["In-memory Stores:<br/>agents<br/>command_queue<br/>results"]
-    Tools["Registered MCP Tools:<br/>register_agent<br/>enqueue_command()<br/>get_next_command()<br/>upload_result()<br/>get_results()"]
+    Srv["server.py\nFastMCP @ port 8000"]
+    Stores["In‑memory Stores:\nagents\ncommand_queue\nresults"]
+    Tools["Registered MCP Tools:\nregister_agent()\nenqueue_command()\nget_next_command()\nupload_result()\nget_results()"]
     Srv --> Stores
     Srv --> Tools
   end
 
   subgraph Ngrok_Tunnel["ngrok Tunnel"]
-    NG["ngrok<br/>https://<ID>.ngrok.io ↔ localhost:8000"]
+    NG["ngrok\nhttps://YOUR_ID.ngrok.io ↔ localhost:8000"]
   end
 
   subgraph Public_SSE["Public SSE Endpoint"]
-    Pub["/mcp on https://<ID>.ngrok.io"]
+    Pub["/mcp on https://YOUR_ID.ngrok.io"]
   end
 
   subgraph Agent["Agent (agent.py)"]
-    A1["1. SSE connect → /mcp"]
-    A2["2. JSON-RPC → register_agent(id)"]
-    A3["3. Loop: get_next_command()"]
-    A4["4. Execute shell command"]
-    A5["5. JSON-RPC → upload_result()"]
+    direction TB
+    A1["1\\. SSE connect → /mcp"]
+    A2["2\\. JSON‑RPC → register_agent(id)"]
+    A3["3\\. Loop: get_next_command()"]
+    A4["4\\. Execute shell command"]
+    A5["5\\. JSON‑RPC → upload_result()"]
     A1 --> A2 --> A3 --> A4 --> A5 --> A3
   end
 
   subgraph CLI["CLI Client (client.py)"]
-    C1["Enqueue: JSON-RPC → enqueue_command(agent_id, cmd, args)"]
-    C2["Fetch: JSON-RPC → get_results(agent_id)"]
+    direction TB
+    C1["Enqueue: JSON‑RPC → enqueue_command(agent_id, cmd, args)"]
+    C2["Fetch: JSON‑RPC → get_results(agent_id)"]
   end
 
   %% Communication flows
-  Srv -->|listens on 8000| Ngrok_Tunnel
+  Srv -->|listens on port 8000| Ngrok_Tunnel
   Ngrok_Tunnel -->|forwards port| Public_SSE
-  Public_SSE -->|SSE + RPC| Agent
+  Public_SSE -->|SSE + RPC| Agent
   Agent -->|RPC| Public_SSE
   Public_SSE -->|RPC| CLI
   CLI -->|RPC| Public_SSE
@@ -104,6 +106,7 @@ flowchart TD
 
   Public_SSE -->|get_results| Tools
   Tools -->|read results| Stores
+
 ```
 
 ---
