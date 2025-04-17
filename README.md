@@ -46,7 +46,7 @@ All communication goes over the public SSE endpoint provided by ngrok.
 
 ---
 
-## Detailed Diagram
+## Detailed Flow
 
 ```mermaid
 flowchart TD
