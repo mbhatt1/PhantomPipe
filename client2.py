@@ -30,21 +30,31 @@ from mcp.client.session import ClientSession
 
 async def call_tool_json(client, tool_name, params):
     """
-    Call an MCP tool and return parsed JSON or raw text.
-    Handles JSON arrays and objects.
+    Calls an MCP tool and returns:
+      - A dict or list if parsed successfully
+      - A list of parsed JSON objects if multiple SSE events
+      - Raw text on non‑JSON payloads
     """
     resp = await client.call_tool(tool_name, {'params': params})
-    # If content exists, parse text
-    if hasattr(resp, 'content') and resp.content:
-        text = ''.join(c.text for c in resp.content)
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            # Return raw text if not JSON
-            return text
-    # If resp itself is a dict or list
+
+    # 1) If already a dict or list, return directly
     if isinstance(resp, (dict, list)):
         return resp
+
+    # 2) Otherwise, resp.content is a list of SSE chunks
+    if hasattr(resp, 'content') and resp.content:
+        items = []
+        for chunk in resp.content:
+            text = chunk.text.strip()
+            if not text:
+                continue
+            try:
+                items.append(json.loads(text))
+            except json.JSONDecodeError:
+                items.append(text)
+        # If only one JSON object, return it directly; else return list
+        return items if len(items) != 1 else items[0]
+
     return None
 
 async def enqueue_command(server_url, agent_id, command, args):
@@ -81,6 +91,10 @@ async def fetch_history(server_url, agent_id):
                 for idx, entry in enumerate(history, 1):
                     print(f"Entry {idx}:")
                     print(json.dumps(entry, indent=2))
+            elif isinstance(history, dict):
+                # Single-entry list flattened
+                print("[+] Full history (1 entry):")
+                print(json.dumps(history, indent=2))
             else:
                 print(f"[!] Failed to fetch history: {history}")
 
