@@ -165,8 +165,8 @@ flowchart TD
 
 1. **Clone the repository**  
    ```bash
-   git clone https://github.com/mbhatt1/mcp_c2_example.git
-   cd mcp_c2_example
+   git clone https://github.com/mbhatt1/PhantomPipe.git
+   cd PhantomPipe
    ```
 2. **Set up a virtual environment & install dependencies**  
    ```bash
