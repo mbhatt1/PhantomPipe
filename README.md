@@ -67,13 +67,13 @@ flowchart TD
     Pub["/mcp on https://YOUR_ID.ngrok.io"]
   end
 
-  subgraph Agent["Agent (agent.py)"]
+  subgraph Agents["Agents (agent.py) × N"]
     direction TB
-    A1["1\\. SSE connect → /mcp"]
-    A2["2\\. JSON‑RPC → register_agent(id)"]
-    A3["3\\. Loop: get_next_command()"]
-    A4["4\\. Execute shell command"]
-    A5["5\\. JSON‑RPC → upload_result()"]
+    A1["1. SSE connect → /mcp"]
+    A2["2. JSON‑RPC → register_agent(id)"]
+    A3["3. Loop: get_next_command()"]
+    A4["4. Execute shell command"]
+    A5["5. JSON‑RPC → upload_result()"]
     A1 --> A2 --> A3 --> A4 --> A5 --> A3
   end
 
@@ -86,8 +86,8 @@ flowchart TD
   %% Communication flows
   Srv -->|listens on port 8000| Ngrok_Tunnel
   Ngrok_Tunnel -->|forwards port| Public_SSE
-  Public_SSE -->|SSE + RPC| Agent
-  Agent -->|RPC| Public_SSE
+  Public_SSE -->|SSE + RPC| Agents
+  Agents -->|RPC| Public_SSE
   Public_SSE -->|RPC| CLI
   CLI -->|RPC| Public_SSE
 
@@ -106,6 +106,7 @@ flowchart TD
 
   Public_SSE -->|get_results| Tools
   Tools -->|read results| Stores
+
 
 ```
 
