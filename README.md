@@ -50,62 +50,67 @@ All communication goes over the public SSE endpoint provided by ngrok.
 
 ```mermaid
 flowchart TD
-  subgraph Local_Server["Local Server"]
+  %% ────────────────────── Local server ──────────────────────
+  subgraph Local_Server["Local&nbsp;Server"]
     direction TB
-    Srv["server.py\nFastMCP @ port 8000"]
-    Stores["In‑memory Stores:\nagents\ncommand_queue\nresults"]
-    Tools["Registered MCP Tools:\nregister_agent()\nenqueue_command()\nget_next_command()\nupload_result()\nget_results()"]
+    Srv["server.py<br/>FastMCP&nbsp;@&nbsp;port&nbsp;8000"]
+    Stores["In‑memory&nbsp;Stores:<br/>•&nbsp;agents<br/>•&nbsp;command_queue<br/>•&nbsp;results"]
+    Tools["Registered&nbsp;MCP&nbsp;Tools:<br/>•&nbsp;register_agent()<br/>•&nbsp;enqueue_command()<br/>•&nbsp;get_next_command()<br/>•&nbsp;upload_result()<br/>•&nbsp;get_results()"]
     Srv --> Stores
     Srv --> Tools
   end
 
-  subgraph Ngrok_Tunnel["ngrok Tunnel"]
-    NG["ngrok\nhttps://YOUR_ID.ngrok.io ↔ localhost:8000"]
+  %% ────────────────────── ngrok tunnel ──────────────────────
+  subgraph Ngrok_Tunnel["ngrok&nbsp;Tunnel"]
+    NG["ngrok<br/>https://YOUR_ID.ngrok.io&nbsp;↔&nbsp;localhost:8000"]
   end
 
-  subgraph Public_SSE["Public SSE Endpoint"]
-    Pub["/mcp on https://YOUR_ID.ngrok.io"]
+  %% ────────────────────── public SSE endpoint ───────────────
+  subgraph Public_SSE["Public&nbsp;SSE&nbsp;Endpoint"]
+    Pub["/mcp&nbsp;on&nbsp;https://YOUR_ID.ngrok.io"]
   end
 
-  subgraph Agents["Agents (agent.py) × N"]
+  %% ────────────────────── agents (× N) ──────────────────────
+  subgraph Agents["Agents&nbsp;(agent.py)&nbsp;×&nbsp;N"]
     direction TB
-    A1["1. SSE connect → /mcp"]
-    A2["2. JSON‑RPC → register_agent(id)"]
-    A3["3. Loop: get_next_command()"]
-    A4["4. Execute shell command"]
-    A5["5. JSON‑RPC → upload_result()"]
+    A1["1\\.&nbsp;SSE&nbsp;connect&nbsp;→&nbsp;/mcp"]
+    A2["2\\.&nbsp;JSON‑RPC&nbsp;→&nbsp;register_agent(id)"]
+    A3["3\\.&nbsp;Loop:&nbsp;get_next_command()"]
+    A4["4\\.&nbsp;Execute&nbsp;shell&nbsp;command"]
+    A5["5\\.&nbsp;JSON‑RPC&nbsp;→&nbsp;upload_result()"]
     A1 --> A2 --> A3 --> A4 --> A5 --> A3
   end
 
-  subgraph CLI["CLI Client (client.py)"]
+  %% ────────────────────── CLI client ────────────────────────
+  subgraph CLI["CLI&nbsp;Client&nbsp;(client.py)"]
     direction TB
-    C1["Enqueue: JSON‑RPC → enqueue_command(agent_id, cmd, args)"]
-    C2["Fetch: JSON‑RPC → get_results(agent_id)"]
+    C1["Enqueue:<br/>JSON‑RPC&nbsp;→&nbsp;enqueue_command(agent_id,&nbsp;cmd,&nbsp;args)"]
+    C2["Fetch:<br/>JSON‑RPC&nbsp;→&nbsp;get_results(agent_id)"]
   end
 
-  %% Communication flows
-  Srv -->|listens on port 8000| Ngrok_Tunnel
-  Ngrok_Tunnel -->|forwards port| Public_SSE
-  Public_SSE -->|SSE + RPC| Agents
-  Agents -->|RPC| Public_SSE
-  Public_SSE -->|RPC| CLI
-  CLI -->|RPC| Public_SSE
+  %% ────────────────────── communication flows ───────────────
+  Srv -- listens&nbsp;on&nbsp;port&nbsp;8000 --> Ngrok_Tunnel
+  Ngrok_Tunnel -- forwards&nbsp;port --> Public_SSE
+  Public_SSE -- SSE&nbsp;+&nbsp;RPC --> Agents
+  Agents -- RPC --> Public_SSE
+  Public_SSE -- RPC --> CLI
+  CLI -- RPC --> Public_SSE
 
-  %% Tool interactions
-  Public_SSE -->|register_agent| Tools
-  Tools -->|store agent| Stores
+  %% ────────────────────── tool interactions ─────────────────
+  Public_SSE -- register_agent --> Tools
+  Tools -- store&nbsp;agent --> Stores
 
-  Public_SSE -->|enqueue_command| Tools
-  Tools -->|append command| Stores
+  Public_SSE -- enqueue_command --> Tools
+  Tools -- append&nbsp;command --> Stores
 
-  Public_SSE -->|get_next_command| Tools
-  Tools -->|read command| Stores
+  Public_SSE -- get_next_command --> Tools
+  Tools -- read&nbsp;command --> Stores
 
-  Public_SSE -->|upload_result| Tools
-  Tools -->|write result| Stores
+  Public_SSE -- upload_result --> Tools
+  Tools -- write&nbsp;result --> Stores
 
-  Public_SSE -->|get_results| Tools
-  Tools -->|read results| Stores
+  Public_SSE -- get_results --> Tools
+  Tools -- read&nbsp;results --> Stores
 
 
 ```
