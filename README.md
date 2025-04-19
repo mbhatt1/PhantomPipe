@@ -62,12 +62,12 @@ flowchart TD
 
   %% ────────────────────── ngrok tunnel ──────────────────────
   subgraph Ngrok_Tunnel["ngrok&nbsp;Tunnel"]
-    NG["ngrok<br/>https://YOUR_ID.ngrok.io&nbsp;↔&nbsp;localhost:8000"]
+    NG["ngrok<br/>https\://YOUR_ID.ngrok.io&nbsp;↔&nbsp;localhost:8000"]
   end
 
   %% ────────────────────── public SSE endpoint ───────────────
   subgraph Public_SSE["Public&nbsp;SSE&nbsp;Endpoint"]
-    Pub["/mcp&nbsp;on&nbsp;https://YOUR_ID.ngrok.io"]
+    Pub["/mcp&nbsp;on&nbsp;https\://YOUR_ID.ngrok.io"]
   end
 
   %% ────────────────────── agents (× N) ──────────────────────
@@ -111,6 +111,7 @@ flowchart TD
 
   Public_SSE -- get_results --> Tools
   Tools -- read&nbsp;results --> Stores
+
 
 
 ```
