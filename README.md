@@ -4,6 +4,8 @@
 
 A proof‑of‑concept C2 framework that uses Server‑Sent Events (SSE) and the MCP protocol for agent registration, command dispatch, and result collection. By tunneling through ngrok, you can quickly expose your C2 server to the public internet for rapid testing and demonstration.
 
+![image](https://github.com/user-attachments/assets/1241e845-88fa-4b28-a56c-7905effeb970)
+
 ---
 
 ## Table of Contents
